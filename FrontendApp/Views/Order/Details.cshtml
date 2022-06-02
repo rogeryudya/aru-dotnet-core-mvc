@@ -1,0 +1,96 @@
+@model Order
+@{
+    var defaultImage = "/img/products/default-image.jpg";
+
+    string getBase64Image(byte[] image)
+    {
+        return Convert.ToBase64String(image);
+    }
+}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="invoice p-3 mb-3">
+
+                <div class="row invoice-info">
+                    <div class="col-sm-4 invoice-col">
+                        ผู้ซื้อ
+                        <address>
+                            <strong>@($"{Model.Customer.FirstName} {Model.Customer.LastName}")</strong><br>
+                        </address>
+                    </div>
+
+                    <div class="col-sm-4 invoice-col">
+                        &nbsp;
+                    </div>
+
+                    <div class="col-sm-4 invoice-col">
+                        <b>หมายเลขคำสั่งซื้อ:</b> @Model.Id<br>
+                        <b>วันที่สั่งซื้อ:</b> @Model.OrderDate.ToString("dd-MM-yyyy")<br>
+                        <b>สถานะ:</b> @OrderHelper.GetStatus(Model.Status)<br>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ภาพ</th>
+                                    <th>ชื่อ</th>
+                                    <th>ราคา</th>
+                                    <th class="col-1">จำนวน</th>
+                                    <th>รวม</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var cart in Model.Carts)
+                                {
+                                    <tr>
+                                        <td>
+                                            @if (cart.Product.Image != null)
+                                            {
+                                                var img = $"data:image/{cart.Product.ImageType};base64,{getBase64Image(cart.Product.Image)}";
+                                                <img class="img-size-50 mr-3 img-circle" src="@img">
+                                            }
+                                            else
+                                            {
+                                                <img class="img-size-50 mr-3 img-circle" src="@defaultImage">
+                                            }
+                                        </td>
+                                        <td>@cart.Product.Name</td>
+                                        <td>@cart.Price</td>
+                                        <td>@cart.Quantity</td>
+                                        <td>@(cart.Price*cart.Quantity)</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+                <div class="row">
+
+                    <div class="col-6">
+                        &nbsp;
+                    </div>
+
+                    <div class="col-6">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <th>รวม:</th>
+                                        <td>฿ @Model.Carts.Sum(s => s.Price*s.Quantity)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

@@ -1,0 +1,137 @@
+@model BackendApp.Dto.EmployeeFormDto
+@{
+  Layout = "~/Views/Shared/_LoggedInLayout.cshtml";
+}
+
+<form class="needs-validation" id="form-employee" action="/employee/save" method="post" novalidate>
+  <input type="hidden" name="id" value="@Model.Id" />
+  @Html.AntiForgeryToken()
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">@ViewBag.FormTitle</h3>
+      <!-- /.card-tools -->
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+      <div class="form-group">
+        <label>ชื่อ</label>
+        <input type="text" class="form-control" id="txtFirstName" name="firstName" placeholder="กรอกชื่อ"
+          value="@Model.FirstName" oninput="validateCommonElement(this.id)" 
+          invalid-required-message="กรุณาระบุชื่อ"
+          invalid-minlength-message="กรุณาระบุชื่ออย่างน้อย 2 ตัวอักษร"
+          invalid-miaxlength-message="กรุณาระบุชื่อไม่เกิน 50 ตัวอักษร" required minlength="2" maxlength="50">
+        <div class="invalid-feedback">
+          กรุณาระบุชื่อพนักงาน
+        </div>
+      </div>
+      <div class="form-group">
+        <label>นามสกุล</label>
+        <input type="text" class="form-control" id="txtLastName" name="lastName" placeholder="กรอกนามสกุล"
+          value="@Model.LastName" oninput="validateCommonElement(this.id)" 
+          invalid-required-message="กรุณาระบุนามสกุล"
+          invalid-minlength-message="กรุณาระบุนามสกุลอย่างน้อย 2 ตัวอักษร"
+          invalid-miaxlength-message="กรุณาระบุนามสกุลไม่เกิน 50 ตัวอักษร" required minlength="2" maxlength="50">
+        <div class="invalid-feedback">
+          กรุณาระบุนามสกุล
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" class="form-control" id="txtUsername" name="username" placeholder="กรอก username"
+          value="@Model.Username" oninput="validateCommonElement(this.id)" 
+          invalid-required-message="กรุณาระบุUsername"
+          invalid-minlength-message="กรุณาระบุUsernameอย่างน้อย 2 ตัวอักษร"
+          invalid-miaxlength-message="กรุณาระบุUsernameไม่เกิน 50 ตัวอักษร" required minlength="2" maxlength="50">
+        <div class="invalid-feedback">
+          กรุณาระบุUsername
+        </div>
+      </div>
+
+      @if (Model.Id == 0)
+      {
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" class="form-control" id="txtPassword" name="password" placeholder="กรอกรหัสผ่าน"
+          oninput="validateCommonElement(this.id)" 
+          invalid-required-message="กรุณาระบุPassword"
+          invalid-minlength-message="กรุณาระบุPasswordอย่างน้อย 8 ตัวอักษร"
+          invalid-miaxlength-message="กรุณาระบุไม่เกิน 50 ตัวอักษร" required minlength="8" maxlength="100">
+          <div class="invalid-feedback">
+            กรุณาระบุPassword
+          </div>
+        </div>
+        <div class="form-group">
+          <label>ยืนยัน Password</label>
+          <input type="password" class="form-control" id="txtConfirmPassword" placeholder="กรอกรหัสผ่านอีกครั้ง"
+          invalid-passwordmismatch-message="กรุณาระบุ password ให้ตรงกัน"
+          oninput="validateConfirmPassword()"
+          invalid-required-message="กรุณาระบุ Confirm Password"
+          required>
+          <div class="invalid-feedback">
+            กรุณาระบุ Confirm Password
+          </div>
+        </div>
+      }
+
+      <div class="form-group">
+        <label>สิทธิ์</label>
+        <select class="form-control" name="role">
+          <option value="admin" @(Model.Role == "admin" ? "selected":"")>Admin</option>
+          <option value="employee" @(Model.Role == "employee" ? "selected":"")>Employee</option>
+        </select>
+      </div>
+    </div>
+    <!-- /.card-body -->
+    <div class="card-footer">
+      <div class="row float-right">
+        <a href="/employee" class="btn btn-default mr-1">ยกเลิก</a>
+        <button type="submit" class="btn btn-success">บันทึก</button>
+      </div>
+    </div>
+    <!-- /.card-footer -->
+  </div>
+  <!-- /.card -->
+</form>
+
+@section Scripts
+{
+<script>
+  window.onload = function () {
+    let form = document.getElementById("form-employee");
+    form.addEventListener('submit', function (event) {
+      if (!form.checkValidity()) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
+
+      form.classList.add('was-validated')
+    });
+  };
+
+  function validateCommonElement(elementId) {
+    let element = document.getElementById(elementId);
+    let errMsg = "";
+
+    if (element.hasAttribute("invalid-required-message") && element.validity.valueMissing) {
+      errMsg = element.getAttribute("invalid-required-message");
+    }
+    else if (element.hasAttribute("invalid-minlength-message") && element.validity.tooShort) {
+      errMsg = element.getAttribute("invalid-minlength-message");
+    }
+
+    if (errMsg.length > 0) {
+      element.closest(".form-group").querySelector(".invalid-feedback").innerHTML = errMsg;
+    }
+  }
+
+  function validateConfirmPassword() {
+    let txtPassword = document.getElementById("txtPassword");
+    let txtConfirmPassword = document.getElementById("txtConfirmPassword");
+    txtConfirmPassword.setCustomValidity("");
+    if (txtPassword.value != txtConfirmPassword.value) {
+      txtConfirmPassword.setCustomValidity(txtConfirmPassword.getAttribute("invalid-passwordmismatch-message"));
+      txtConfirmPassword.closest(".form-group").querySelector(".invalid-feedback").innerHTML = txtConfirmPassword.getAttribute("invalid-passwordmismatch-message");
+    }
+  }
+</script>
+}

@@ -1,0 +1,117 @@
+@model BackendApp.Dto.ProductFormDto
+@{
+  Layout = "~/Views/Shared/_LoggedInLayout.cshtml";
+  var fileImage = Model.ImageByteArray == null ?
+  $"/img/products/default-image.jpg" : 
+  $"data:image/{Model.ImageType};base64,{Convert.ToBase64String(Model.ImageByteArray)}";
+}
+
+<form class="needs-validation" enctype="multipart/form-data" id="form-product" action="/product/save" method="post" novalidate>
+  <input type="hidden" name="id" value="@Model.Id" />
+  @Html.AntiForgeryToken()
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">@ViewBag.FormTitle</h3>
+      <!-- /.card-tools -->
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+      <div class="form-group">
+        <label>ชื่อสินค้า</label>
+        <input type="text" class="form-control" id="txtName" name="name" placeholder="กรอกชื่อสินค้า"
+          value="@Model.Name" oninput="validateCommonElement(this.id)" 
+          invalid-required-message="กรุณาระบุชื่อสินค้า"
+          invalid-minlength-message="กรุณาระบุชื่อสินค้าอย่างน้อย 2 ตัวอักษร"
+          invalid-miaxlength-message="กรุณาระบุชื่อสินค้าไม่เกิน 50 ตัวอักษร" required minlength="2" maxlength="50">
+        <div class="invalid-feedback">
+          กรุณาระบุชื่อสินค้า
+        </div>
+      </div>
+      <div class="form-group">
+        <label>หมวดหมู่</label>
+        <select class="form-control" name="category">
+          <option value="1" @(Model.Category == 1 ? "selected":"")>แป้ง</option>
+          <option value="2" @(Model.Category == 2 ? "selected":"")>เนื้อสัตว์</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>ราคาสินค้า(บาท)</label>
+        <input type="number" class="form-control" id="txtPrice" name="price" placeholder="กรอกราคาสินค้า"
+          value="@Model.Price" oninput="validateCommonElement(this.id)" 
+          invalid-required-message="กรุณาระบุราคาสินค้า"
+          invalid-min-message="กรุณาระบุราคาสินค้าอย่างน้อย 1 บาท" required min="1">
+        <div class="invalid-feedback">
+          กรุณาระบุราคาสินค้า
+        </div>
+      </div>
+      <div class="form-group">
+        <label>รายละเอียดสินค้า</label>
+        <textarea class="form-control" name="details" rows="3" placeholder="ระบุรายละเอียดสินค้า"
+          oninput="validateCommonElement(this.id)" invalid-required-message="กรุณาระบุรายละเอียดสินค้า"
+          invalid-maxlength-message="กรุณาระบุรายละเอียดสินค้าไม่เกิน 500 ตัวอักษร" required
+          maxlength="500">@Model.Details</textarea>
+        <div class="invalid-feedback">
+          กรุณาระบุรายละเอียดสินค้า
+        </div>
+      </div>
+      <div class="form-group">
+        <img id="file-image-preview" class="img-thumbnail col-3 mt-5" src="@fileImage" />
+        <input type="file" class="form-control form-control-sm" id="productFile" name="imageFile" accept="image/*"
+          onchange="previewImage(event)" max-file-size="1" /><!-- 1 MB-->
+      </div>
+    </div>
+    <!-- /.card-body -->
+    <div class="card-footer">
+      <div class="row float-right">
+        <a href="/product" class="btn btn-default mr-1">ยกเลิก</a>
+        <button type="submit" class="btn btn-success">บันทึก</button>
+      </div>
+    </div>
+    <!-- /.card-footer -->
+  </div>
+  <!-- /.card -->
+</form>
+
+@section Scripts
+{
+<script>
+  window.onload = function () {
+    let form = document.getElementById("form-product");
+    form.addEventListener('submit', function (event) {
+      if (!form.checkValidity()) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
+
+      form.classList.add('was-validated')
+    });
+  };
+
+  function validateCommonElement(elementId) {
+    let element = document.getElementById(elementId);
+    let errMsg = "";
+
+    if (element.hasAttribute("invalid-required-message") && element.validity.valueMissing) {
+      errMsg = element.getAttribute("invalid-required-message");
+    }
+    else if (element.hasAttribute("invalid-minlength-message") && element.validity.tooShort) {
+      errMsg = element.getAttribute("invalid-minlength-message");
+    } else if (element.hasAttribute("invalid-min-message") && element.validity.rangeUnderflow) {
+      errMsg = element.getAttribute("invalid-min-message");
+    }
+
+    if (errMsg.length > 0) {
+      element.closest(".form-group").querySelector(".invalid-feedback").innerHTML = errMsg;
+    }
+  }
+
+  function previewImage(event) {
+    if (event.target.files.length > 0) {
+      var src = URL.createObjectURL(event.target.files[0]);
+      var preview = document.getElementById("file-image-preview");
+      preview.src = src;
+      preview.style.display = "block";
+    }
+  }
+</script>
+}

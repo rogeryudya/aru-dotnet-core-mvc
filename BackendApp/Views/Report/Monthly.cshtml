@@ -1,0 +1,93 @@
+@model List<ReportResultDto>
+@{
+  Layout = "~/Views/Shared/_LoggedInLayout.cshtml";
+}
+
+<div class="row">
+  <form class="row col-12">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">รายการขายประจำเดือน</h3>
+        </div>
+
+        <div class="card-body table-responsive p-0">
+          <div class="row mt-3 mr-2 float-right">
+            <div class="col-auto float-right">
+              <div class="input-group input-group-sm" style="width: 250px;">
+                <select name="month" class="form-control">
+                    <option value="1" @(ViewBag.Month == 1 ? "selected":"")>มกราคม</option>
+                    <option value="2" @(ViewBag.Month == 2 ? "selected":"")>กุมภาพันธ์</option>
+                    <option value="3" @(ViewBag.Month == 3 ? "selected":"")>มีนาคม</option>
+                    <option value="4" @(ViewBag.Month == 4 ? "selected":"")>เมษายน</option>
+                    <option value="5" @(ViewBag.Month == 5 ? "selected":"")>พฤษภาคม</option>
+                    <option value="6" @(ViewBag.Month == 6 ? "selected":"")>มิถุนายน</option>
+                    <option value="7" @(ViewBag.Month == 7 ? "selected":"")>กรกฏาคม</option>
+                    <option value="8" @(ViewBag.Month == 8 ? "selected":"")>สิงหาคม</option>
+                    <option value="9" @(ViewBag.Month == 9 ? "selected":"")>กันยายน</option>
+                    <option value="10" @(ViewBag.Month == 10 ? "selected":"")>ตุลาคม</option>
+                    <option value="11" @(ViewBag.Month == 11 ? "selected":"")>พฤศจิกายน</option>
+                    <option value="12" @(ViewBag.Month == 12 ? "selected":"")>ธันวาคม</option>
+                </select>
+              </div>
+              <div class="input-group input-group-sm" style="width: 250px;">
+                <input type="number" name="year" class="form-control float-right" placeholder="ค้นหาด้วยปี ค.ศ. 20xx"
+                  value="@ViewBag.Year">
+                <div class="input-group-append">
+                  <button type="submit" class="btn btn-default">
+                    <i class="fas fa-search"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <canvas id="barChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%; display: block; width: 572px;" 
+          width="715" height="312" c
+          class="chartjs-render-monitor">
+
+          </canvas>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+@section Scripts {
+<script type="text/javascript">
+  $(function () {
+    var barChartCanvas = $('#barChart').get(0).getContext('2d')
+    var areaChartData = {
+      labels  : [@Html.Raw(string.Join(",", Model.Select(s => s.Label)))],
+      datasets: [
+        {
+          label               : 'ยอดขาย',
+          backgroundColor     : 'rgba(60,141,188,0.9)',
+          borderColor         : 'rgba(60,141,188,0.8)',
+          pointRadius          : false,
+          pointColor          : '#3b8bba',
+          pointStrokeColor    : 'rgba(60,141,188,1)',
+          pointHighlightFill  : '#fff',
+          pointHighlightStroke: 'rgba(60,141,188,1)',
+          data                : [@Html.Raw(string.Join(",", Model.Select(s => s.Value)))]
+        }
+      ]
+    };
+    
+    var barChartData = $.extend(true, {}, areaChartData)
+    barChartData.datasets[0] = areaChartData.datasets[0]
+   var barChartOptions = {
+      responsive              : true,
+      maintainAspectRatio     : false,
+      datasetFill             : false
+    }
+
+    new Chart(barChartCanvas, {
+      type: 'bar',
+      data: barChartData,
+      options: barChartOptions
+    })
+  });
+</script>
+}

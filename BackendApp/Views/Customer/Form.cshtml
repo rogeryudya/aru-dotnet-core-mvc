@@ -1,0 +1,44 @@
+@model BackendApp.Dto.CustomerFormDto
+@{
+    Layout = "~/Views/Shared/_LoggedInLayout.cshtml";
+}
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">@ViewBag.FormTitle</h3>
+        <!-- /.card-tools -->
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+        <div class="form-group">
+            <label>ชื่อ</label>
+            <input type="text" class="form-control" id="txtFirstName" name="firstName" value="@Model.FirstName"
+                disabled>
+        </div>
+        <div class="form-group">
+            <label>นามสกุล</label>
+            <input type="text" class="form-control" id="txtLastName" name="lastName" value="@Model.LastName">
+        </div>
+
+        <div class="form-group">
+            <label>เพศ</label>
+
+            <div class="form-check">
+                <input class="form-check-input" type="radio" disabled @(Model.Gender == 0 ? "checked" : "")>
+                <label class="form-check-label">ชาย</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" disabled @(Model.Gender == 1 ? "checked" : "")>
+                <label class="form-check-label">หญิง</label>
+            </div>
+        </div>
+    </div>
+    <!-- /.card-body -->
+    <div class="card-footer">
+        <div class="row float-right">
+            <a href="/customer" class="btn btn-default mr-1">ยกเลิก</a>
+        </div>
+    </div>
+    <!-- /.card-footer -->
+</div>
+<!-- /.card -->

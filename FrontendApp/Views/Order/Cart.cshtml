@@ -1,0 +1,90 @@
+@model List<OrderCartProductDto>
+@{
+    var defaultImage = "/img/products/default-image.jpg";
+    var rowCount = 0;
+
+    string getBase64Image(byte[] image)
+    {
+        return Convert.ToBase64String(image);
+    }
+}
+
+
+<div class="row">
+    <form class="row col-12" action="/order/change" method="post">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">สินค้า</h3>
+                </div>
+
+                <div class="card-body table-responsive p-0  mt-3 ">
+                    <table id="tb" class="table table-striped projects">
+                        <thead>
+                            <tr>
+                                <th>ภาพ</th>
+                                <th>ชื่อ</th>
+                                <th>ราคา</th>
+                                <th class="col-1">จำนวน</th>
+                                <th>รวม</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @if (item.Image != null)
+                                        {
+                                            var img = $"data:image/{item.ImageType};base64,{getBase64Image(item.Image)}";
+                                            <img class="img-size-50 mr-3 img-circle" src="@img">
+                                        }
+                                        else
+                                        {
+                                            <img class="img-size-50 mr-3 img-circle" src="@defaultImage">
+                                        }
+                                    </td>
+                                    <td>@item.Name</td>
+                                    <td>@item.Price</td>
+                                    <td>
+                                        <input type="hidden" value="@item.ProductId" 
+                                        name="[@(rowCount)].ProductId" />
+                                        <input type="number" class="form-control" value="@item.Quantity" 
+                                        name="[@(rowCount)].Quantity"
+                                        required/>
+                                    </td>
+                                    <td>@(item.Price*item.Quantity)</td>
+                                </tr>
+                                rowCount++;
+                            }
+
+                            @if (Model.Count() == 0)
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center">ไม่มีสินค้าในตะกร้า</td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="4">รวม</th>
+                                <th>@Model.Sum(s => s.Price*s.Quantity)</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="card-footer clearfix">
+                    @if (Model.Count() > 0)
+                    {
+                        <span>
+                            <button type="submit" class="btn btn-warning">แก้ไขคำสั่งซื้อ</button>
+                        </span>
+                        <span>
+                            <a href="/order/submit" class="btn btn-primary">ยืนยันคำสั่งซื้อ</a>
+                        </span>
+                    }
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

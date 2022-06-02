@@ -1,0 +1,125 @@
+@model ContentResult<List<Employee>>
+@{
+  Layout = "~/Views/Shared/_LoggedInLayout.cshtml";
+}
+
+<div class="row">
+  <form class="row col-12">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">รายชื่อพนักงาน</h3>
+        </div>
+
+        <div class="card-body table-responsive p-0">
+          <div class="row mt-3 mr-2 float-right">
+            <div class="col-auto float-right">
+              <div class="input-group input-group-sm" style="width: 250px;">
+                <input type="text" name="search" class="form-control float-right" placeholder="ค้นหาด้วย ชื่อ - นามสกุล"
+                  value="@ViewBag.SearchQuery">
+                <div class="input-group-append">
+                  <button type="submit" class="btn btn-default">
+                    <i class="fas fa-search"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="col-auto float-right">
+              <a class="btn btn-success" href="/employee/create">สร้างพนักงาน</a>
+            </div>
+          </div>
+          <table id="tb-employee" class="table table-striped projects">
+            <thead>
+              <tr>
+                <th>รหัส</th>
+                <th>ชื่อ</th>
+                <th>นามสกุล</th>
+                <th>ตำแหน่ง</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @foreach (var item in Model.Result)
+              {
+                <tr>
+                  <td>@item.Id</td>
+                  <td>@item.FirstName</td>
+                  <td>@item.LastName</td>
+                  <td>@item.Role</td>
+                  <td>
+                    <a class="btn btn-info btn-sm" href="/employee/edit/@item.Id">
+                      <i class="fas fa-pencil-alt">
+                      </i>
+                      แก้ไข
+                    </a>
+                    &nbsp;
+                    @if (item.Role != "admin")
+                    {
+                      <button type="button" class="btn btn-danger btn-sm" data-href="/employee/delete/@item.Id"
+                    data-toggle="modal" data-target="#confirm-delete">
+                        <i class="fas fa-trash">
+                        </i>
+                        ลบ
+                      </button>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+
+        </div>
+        <div class="card-footer clearfix">
+          <ul class="pagination pagination-sm m-0 float-right">
+            @for (int i = 1; i <= Model.TotalPage; i++)
+            {
+              <td>
+                @if (i != Model.CurrentPage)
+                {
+                  <li class="page-item"><a class="page-link" href="javascript:PagerClick(@i);">@i</a></li>
+                }
+                else
+                {
+                  <li class="page-item"><a class="page-link active" href="javascript:return false;">@i</a></li>
+                }
+              </td>
+            }
+          </ul>
+          <input type="hidden" id="pageIndex" name="currentPage" />
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-body">
+        คุณต้องการยืนยันการลบข้อมูลนี้ ?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <a class="btn btn-danger btn-ok" id="btnConfirmDelete">Delete</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+<script type="text/javascript">
+  $(function () {
+    $('#confirm-delete').on('shown.bs.modal', function (e) {
+      let target = e.relatedTarget;
+      $("#btnConfirmDelete").attr("href", $(target).data('href'));
+    })
+  });
+
+  function PagerClick(index) {
+    document.getElementById("pageIndex").value = index;
+    document.forms[0].submit();
+  }
+
+</script>
+}

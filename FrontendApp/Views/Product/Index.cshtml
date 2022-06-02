@@ -1,0 +1,70 @@
+@model ContentResult<List<Product>>
+@{
+    var defaultImage = "/img/products/default-image.jpg";
+
+    string getBase64Image(byte[] image)
+    {
+        return Convert.ToBase64String(image);
+    }
+}
+
+<div class="container">
+
+    <div class="row">
+        @foreach (var product in Model.Result)
+        {
+            <div class="col-md-3">
+                <div class="card mb-4 box-shadow">
+                    @if (product.Image != null)
+                    {
+                        var img = $"data:image/{product.ImageType};base64,{getBase64Image(product.Image)}";
+                        <img class="card-img-top" src="@img">
+                    }
+                    else
+                    {
+                        <img class="card-img-top" src="@defaultImage">
+                    }
+                    <div class="card-body">
+                        <p class="card-text">@product.Name</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <strong class="text-muted text-warning">฿@product.Price</strong>
+                            <span class="float-right">
+                                <a class="btn btn-info" href="/details/@product.Id">ดูรายละเอียดสินค้า</a>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        <form class="row col-12">
+        <div class="card-footer clearfix">
+            <ul class="pagination pagination-sm m-0 float-right">
+                @for (int i = 1; i <= Model.TotalPage; i++)
+                {
+                    <td>
+                        @if (i != Model.CurrentPage)
+                        {
+                            <li class="page-item"><a class="page-link" href="javascript:PagerClick(@i);">@i</a></li>
+                        }
+                        else
+                        {
+                            <li class="page-item"><a class="page-link active" href="javascript:return false;">@i</a></li>
+                        }
+                    </td>
+                }
+            </ul>
+            <input type="hidden" id="pageIndex" name="currentPage" />
+        </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts
+{
+<script>
+    function PagerClick(index) {
+        document.getElementById("pageIndex").value = index;
+        document.forms[0].submit();
+    }
+</script>
+}
